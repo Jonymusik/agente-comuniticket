@@ -34,7 +34,7 @@ app.post('/webhook', async (req, res) => {
 
   try {
     console.log('🟢 PASO 4: Conectando con Gemini (gemini-pro)...');
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `Actúa como el Agente Estratega de comunicación pública de la Municipalidad de Orotina. Acabas de recibir este ticket:
     Funcionario: ${nombre}
     Asunto: ${asunto}
