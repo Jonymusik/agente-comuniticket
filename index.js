@@ -27,7 +27,7 @@ app.post('/webhook', async (req, res) => {
   });
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
     const prompt = `Actúa como el Agente Estratega de comunicación pública de la Municipalidad de Orotina.
     Acabas de recibir esta solicitud de ticket:
     - Funcionario: ${nombre}
