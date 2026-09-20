@@ -34,7 +34,7 @@ app.post('/webhook', async (req, res) => {
 
   // 2. Procesamiento con Gemini Flash
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const prompt = `Actúa como el Agente Estratega de comunicación pública de la Municipalidad de Orotina.
     Acabas de recibir esta solicitud de ticket:
     - Funcionario: ${nombre}
