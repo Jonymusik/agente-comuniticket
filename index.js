@@ -11,13 +11,14 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 app.post('/webhook', async (req, res) => {
+  console.log('🟢 PASO 1: Webhook recibido. Iniciando proceso...');
   const asunto = req.body.subject || 'Solicitud de Divulgación General';
   const mensaje = req.body.message || 'Sin detalles específicos. Revisar el ticket.';
   const nombre = req.body.name || 'Funcionario Municipal';
 
-  // 1. Alerta a Telegram con detector de errores
   try {
-    const telegramRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+    console.log('🟢 PASO 2: Enviando primera alerta a Telegram...');
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -26,46 +27,45 @@ app.post('/webhook', async (req, res) => {
         parse_mode: 'Markdown' 
       })
     });
-    const teleData = await telegramRes.json();
-    if (!teleData.ok) console.error('Fallo en Telegram (Alerta):', teleData);
+    console.log('🟢 PASO 3: Primera alerta entregada.');
   } catch (err) {
-    console.error('Error de red al contactar a Telegram:', err);
+    console.error('🔴 ERROR en PASO 2:', err);
   }
 
-  // 2. Procesamiento con Gemini Flash
   try {
+    console.log('🟢 PASO 4: Conectando con Gemini (gemini-pro)...');
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const prompt = `Actúa como el Agente Estratega de comunicación pública de la Municipalidad de Orotina.
-    Acabas de recibir esta solicitud de ticket:
-    - Funcionario: ${nombre}
-    - Asunto: ${asunto}
-    - Detalles: ${mensaje}
+    const prompt = `Actúa como el Agente Estratega de comunicación pública de la Municipalidad de Orotina. Acabas de recibir este ticket:
+    Funcionario: ${nombre}
+    Asunto: ${asunto}
+    Detalles: ${mensaje}
     
-    Analiza la información y genera una propuesta estratégica que incluya estrictamente:
-    1. Estrategia AIDA (Atención, Interés, Deseo, Acción) resumida en un párrafo.
-    2. Copy sugerido para un arte de 1080x1080 listo para Facebook/Instagram.
-    3. Guion rápido para un Reel (formato vertical 9:16), indicando visuales sugeridos y texto en pantalla.
-    
-    Usa un tono institucional, claro, pero fresco y cercano a la comunidad ciudadana.`;
+    Genera una propuesta breve con: 1. Párrafo AIDA. 2. Copy para Facebook. 3. Guion de Reel.`;
 
     const result = await model.generateContent(prompt);
     const respuestaIA = result.response.text();
+    console.log(`🟢 PASO 5: Gemini respondió con éxito. Longitud del texto: ${respuestaIA.length} caracteres.`);
 
-    // 3. Envío de la estrategia a Telegram
+    console.log('🟢 PASO 6: Enviando estrategia a Telegram...');
     const finalRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: CHAT_ID, text: respuestaIA })
     });
     const finalData = await finalRes.json();
-    if (!finalData.ok) console.error('Fallo en Telegram (Estrategia):', finalData);
+    
+    if (!finalData.ok) {
+       console.error('🔴 PASO 7 ERROR DE TELEGRAM (Estrategia rechazada):', finalData);
+    } else {
+       console.log('🟢 PASO 7: Estrategia entregada en Telegram. PROCESO COMPLETADO.');
+    }
 
     res.status(200).send('Flujo completado');
   } catch (error) {
-    console.error('Error procesando la IA:', error);
+    console.error('🔴 ERROR CRÍTICO procesando la IA:', error);
     res.status(500).send('Error interno');
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor seguro en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Servidor en línea en puerto ${PORT} (Modo Rastreador)`));
