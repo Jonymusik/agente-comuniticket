@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const TELEGRAM_TOKEN = '8759116077:AAHa6Qd_qpnvS0Xox4qbYN_cwo9jeQAVEIk';
+const TELEGRAM_TOKEN = '8759116077:AAHa6Qd_qpnvs0Xox4qbYN_cwo9jeQAVEIk';
 const CHAT_ID = '5800933746'; 
 
 app.post('/webhook', async (req, res) => {
